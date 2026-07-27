@@ -2,6 +2,8 @@
   "config": {
     "step": {
       "user": {
+        "title": "V\u00e6lg liga",
+        "description": "Inds\u00e6t adressen til ligaens stillingsside p\u00e5 Bold.dk.",
         "title": "Vælg liga",
         "description": "Indsæt adressen til ligaens stillingsside på Bold.dk.",
         "data": {
@@ -10,6 +12,10 @@
         }
       },
       "clubs": {
+        "title": "V\u00e6lg klubber",
+        "description": "Afkryds de klubber, du vil have sensorer for.",
+        "data": {
+          "clubs": "Klubber"
         "title": "Vælg klubber",
         "description": "Afkryds de klubber, du vil have sensorer for.",
         "data": {
@@ -23,6 +29,7 @@
       }
     },
     "error": {
+      "cannot_connect": "Klubberne kunne ikke findes p\u00e5 ligasiden. Kontroll\u00e9r adressen, og pr\u00f8v igen."
       "cannot_connect": "Klubberne kunne ikke findes på ligasiden. Kontrollér adressen, og prøv igen."
     },
     "abort": {
@@ -31,6 +38,18 @@
   },
   "entity": {
     "sensor": {
+      "position": {
+        "name": "Placering"
+      },
+      "last_match": {
+        "name": "Seneste kamp"
+      },
+      "next_match": {
+        "name": "N\u00e6ste kamp"
+      },
+      "top_scorer": {
+        "name": "Topscorer"
+      }
       "position": { "name": "Placering" },
       "last_match": { "name": "Seneste kamp" },
       "next_match": { "name": "Næste kamp" },
