@@ -1,0 +1,12 @@
+{
+  "domain": "bold_dk",
+  "name": "Bold.dk",
+  "codeowners": [],
+  "config_flow": true,
+  "documentation": "https://github.com/ha-bold/ha-bold",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "loggers": ["custom_components.bold_dk"],
+  "requirements": [],
+  "version": "0.1.0"
+}
