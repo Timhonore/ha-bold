@@ -2,6 +2,18 @@
   "config": {
     "step": {
       "user": {
+        "title": "Choose league",
+        "description": "Paste the URL of the standings page for the league on Bold.dk.",
+        "data": {
+          "league_name": "League name",
+          "league_url": "Bold.dk league URL"
+        }
+      },
+      "clubs": {
+        "title": "Choose clubs",
+        "description": "Select the clubs you want sensors for.",
+        "data": {
+          "clubs": "Clubs"
         "title": "Følg klubber og ligaer på Bold.dk",
         "description": "Indsæt én favorit pr. linje som `Navn | https://bold.dk/...`. Brug URL'en til klubbens eller ligaens side på Bold.dk.",
         "data": {
@@ -11,6 +23,18 @@
       }
     },
     "error": {
+      "cannot_connect": "Could not find clubs on the league page. Check the URL and try again."
+    },
+    "abort": {
+      "already_configured": "This league is already configured."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "position": { "name": "Position" },
+      "last_match": { "name": "Last match" },
+      "next_match": { "name": "Next match" },
+      "top_scorer": { "name": "Top scorer" }
       "invalid_targets": "Brug formatet `Navn | https://bold.dk/...` på hver linje. Kun sikre Bold.dk-links er tilladt."
     },
     "abort": {
