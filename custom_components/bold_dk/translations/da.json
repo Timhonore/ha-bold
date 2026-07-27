@@ -4,6 +4,8 @@
       "user": {
         "title": "V\u00e6lg liga",
         "description": "Inds\u00e6t adressen til ligaens stillingsside p\u00e5 Bold.dk.",
+        "title": "Vælg liga",
+        "description": "Indsæt adressen til ligaens stillingsside på Bold.dk.",
         "data": {
           "league_name": "Ligaens navn",
           "league_url": "Bold.dk-adresse til ligaen"
@@ -14,11 +16,21 @@
         "description": "Afkryds de klubber, du vil have sensorer for.",
         "data": {
           "clubs": "Klubber"
+        "title": "Vælg klubber",
+        "description": "Afkryds de klubber, du vil have sensorer for.",
+        "data": {
+          "clubs": "Klubber"
+        "title": "Følg klubber og ligaer på Bold.dk",
+        "description": "Indsæt én favorit pr. linje som `Navn | https://bold.dk/...`. Brug URL'en til klubbens eller ligaens side på Bold.dk.",
+        "data": {
+          "name": "Navn på integrationen",
+          "targets": "Favoritter"
         }
       }
     },
     "error": {
       "cannot_connect": "Klubberne kunne ikke findes p\u00e5 ligasiden. Kontroll\u00e9r adressen, og pr\u00f8v igen."
+      "cannot_connect": "Klubberne kunne ikke findes på ligasiden. Kontrollér adressen, og prøv igen."
     },
     "abort": {
       "already_configured": "Ligaen er allerede konfigureret."
@@ -38,6 +50,14 @@
       "top_scorer": {
         "name": "Topscorer"
       }
+      "position": { "name": "Placering" },
+      "last_match": { "name": "Seneste kamp" },
+      "next_match": { "name": "Næste kamp" },
+      "top_scorer": { "name": "Topscorer" }
+      "invalid_targets": "Brug formatet `Navn | https://bold.dk/...` på hver linje. Kun sikre Bold.dk-links er tilladt."
+    },
+    "abort": {
+      "already_configured": "Bold.dk er allerede konfigureret."
     }
   }
 }
