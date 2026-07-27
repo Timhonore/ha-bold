@@ -14,6 +14,11 @@
         "description": "Afkryds de klubber, du vil have sensorer for.",
         "data": {
           "clubs": "Klubber"
+        "title": "Følg klubber og ligaer på Bold.dk",
+        "description": "Indsæt én favorit pr. linje som `Navn | https://bold.dk/...`. Brug URL'en til klubbens eller ligaens side på Bold.dk.",
+        "data": {
+          "name": "Navn på integrationen",
+          "targets": "Favoritter"
         }
       }
     },
@@ -30,6 +35,10 @@
       "last_match": { "name": "Seneste kamp" },
       "next_match": { "name": "Næste kamp" },
       "top_scorer": { "name": "Topscorer" }
+      "invalid_targets": "Brug formatet `Navn | https://bold.dk/...` på hver linje. Kun sikre Bold.dk-links er tilladt."
+    },
+    "abort": {
+      "already_configured": "Bold.dk er allerede konfigureret."
     }
   }
 }

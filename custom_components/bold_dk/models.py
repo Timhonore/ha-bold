@@ -8,6 +8,12 @@ from dataclasses import dataclass, field
 @dataclass(frozen=True, slots=True)
 class Club:
     """A club available in a league."""
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True, slots=True)
+class Target:
+    """A club or league page followed by the user."""
 
     name: str
     url: str
@@ -49,3 +55,9 @@ class LeagueData:
     url: str
     standings: tuple[tuple[int, str], ...] = ()
     clubs: dict[str, ClubData] = field(default_factory=dict)
+class Story:
+    """A story discovered on Bold.dk."""
+
+    title: str
+    url: str
+    published: str | None = None
