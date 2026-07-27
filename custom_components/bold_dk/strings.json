@@ -1,0 +1,35 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Choose league",
+        "description": "Paste the URL of the standings page for the league on Bold.dk.",
+        "data": {
+          "league_name": "League name",
+          "league_url": "Bold.dk league URL"
+        }
+      },
+      "clubs": {
+        "title": "Choose clubs",
+        "description": "Select the clubs you want sensors for.",
+        "data": {
+          "clubs": "Clubs"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not find clubs on the league page. Check the URL and try again."
+    },
+    "abort": {
+      "already_configured": "This league is already configured."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "position": { "name": "Position" },
+      "last_match": { "name": "Last match" },
+      "next_match": { "name": "Next match" },
+      "top_scorer": { "name": "Top scorer" }
+    }
+  }
+}
