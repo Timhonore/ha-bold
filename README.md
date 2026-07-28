@@ -32,6 +32,11 @@ valgt klub. Data opdateres hvert 15. minut for at begrænse belastningen på Bol
 
 Bold.dk kan ændre HTML-strukturen uden varsel. Hvis en værdi ikke findes på den
 offentlige klubside, vises sensoren som ukendt frem for at gætte på værdien.
+
+Brugerfladens danske tekster ligger direkte i integrationens `strings.json`. Der
+medfølger ikke en separat dansk oversættelsesfil, så Home Assistant kan ikke blive
+blokeret af en forældet eller beskadiget `translations/da.json`. Ved opgradering
+fra en tidligere version skal den gamle fil slettes, før Home Assistant genstartes.
 En uofficiel Home Assistant-integration, som gør de seneste historier for dine
 favoritklubber og -ligaer på [Bold.dk](https://bold.dk) til sensorer.
 
