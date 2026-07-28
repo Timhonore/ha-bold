@@ -9,6 +9,7 @@ ROOT = Path(__file__).parents[1]
 JSON_FILES = (
     ROOT / "custom_components/bold_dk/manifest.json",
     ROOT / "custom_components/bold_dk/strings.json",
+    ROOT / "custom_components/bold_dk/translations/da.json",
     ROOT / "hacs.json",
 )
 
