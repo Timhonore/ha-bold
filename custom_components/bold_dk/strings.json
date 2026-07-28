@@ -1,0 +1,35 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Vælg liga",
+        "description": "Indsæt adressen til ligaens stillingsside på Bold.dk.",
+        "data": {
+          "league_name": "Ligaens navn",
+          "league_url": "Bold.dk-adresse til ligaen"
+        }
+      },
+      "clubs": {
+        "title": "Vælg klubber",
+        "description": "Afkryds de klubber, du vil have sensorer for.",
+        "data": {
+          "clubs": "Klubber"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Klubberne kunne ikke findes på ligasiden. Kontrollér adressen, og prøv igen."
+    },
+    "abort": {
+      "already_configured": "Ligaen er allerede konfigureret."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "position": { "name": "Placering" },
+      "last_match": { "name": "Seneste kamp" },
+      "next_match": { "name": "Næste kamp" },
+      "top_scorer": { "name": "Topscorer" }
+    }
+  }
+}
