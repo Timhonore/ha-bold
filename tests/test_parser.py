@@ -1,7 +1,12 @@
 """Tests for league and club parsing."""
 
 from custom_components.bold_dk.models import Club
-from custom_components.bold_dk.parser import parse_club_data, parse_clubs, parse_standings
+from custom_components.bold_dk.parser import (
+    parse_club_data,
+    parse_clubs,
+    parse_standings,
+    parse_stories,
+)
 
 LEAGUE_HTML = """
 <nav><a href="/fodbold/resultater">Seneste resultater</a></nav>
@@ -41,9 +46,6 @@ def test_parse_club_statistics() -> None:
     assert data.next_match and data.next_match.description == "AGF - Randers FC søndag 18:00"
     assert data.top_scorer == "Mohamed Touré"
     assert data.top_scorer_goals == 9
-"""Tests for the HTML parser."""
-
-from custom_components.bold_dk.parser import parse_stories
 
 
 def test_parse_json_ld_and_remove_duplicates() -> None:

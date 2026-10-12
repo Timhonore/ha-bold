@@ -33,41 +33,18 @@ valgt klub. Data opdateres hvert 15. minut for at begrænse belastningen på Bol
 Bold.dk kan ændre HTML-strukturen uden varsel. Hvis en værdi ikke findes på den
 offentlige klubside, vises sensoren som ukendt frem for at gætte på værdien.
 
-Brugerfladens danske tekster ligger direkte i integrationens `strings.json`. Der
-medfølger ikke en separat dansk oversættelsesfil, så Home Assistant kan ikke blive
-blokeret af en forældet eller beskadiget `translations/da.json`. Ved opgradering
-fra en tidligere version skal den gamle fil slettes, før Home Assistant genstartes.
-En uofficiel Home Assistant-integration, som gør de seneste historier for dine
-favoritklubber og -ligaer på [Bold.dk](https://bold.dk) til sensorer.
+## Opdatering til 0.2.1
 
-> Projektet er ikke udviklet, godkendt eller supporteret af Bold.dk.
+Geninstallér integrationen via HACS og genstart Home Assistant. Ved manuel
+installation erstattes hele `custom_components/bold_dk` med den nye mappe.
+Både `strings.json` og `translations/da.json` medfølger nu som valideret JSON.
+Stillinger, kampe og ligaens klubtopscorere læses fra Bold.dk-sidernes offentlige
+Nuxt-data. Næste kamp har dato/tid i `kickoff` i datamodellen og i sensorens tekst.
 
-## Funktioner
-
-- Konfigureres direkte fra Home Assistants brugerflade.
-- Følg enhver klub- eller ligaside på `https://bold.dk`.
-- Én sensor pr. favorit med den nyeste overskrift som tilstand.
-- Sensorattributter indeholder linket til den nyeste historie og op til ti historier.
-- Opdaterer hvert 15. minut og bruger Home Assistants fælles HTTP-session.
-
-## Installation
-
-1. Kopiér `custom_components/bold_dk` til samme placering i din Home Assistant-konfiguration.
-2. Genstart Home Assistant.
-3. Gå til **Indstillinger → Enheder og tjenester → Tilføj integration** og søg efter **Bold.dk**.
-4. Find de ønskede klub- eller ligasider på Bold.dk, og indsæt én pr. linje:
-
-   ```text
-   Brøndby IF | https://bold.dk/fodbold/klubber/broendby-if
-   Superligaen | https://bold.dk/fodbold/ligaer/superligaen
-   ```
-
-Bold.dk kan ændre både adresser og HTML uden varsel. Brug derfor den URL, som
-aktuelt vises i browseren, frem for at kopiere eksempeladresserne ukritisk.
+Nye opsætninger bruger liga- og klubvalget. Eksisterende opsætninger med
+nyhedsfavoritter bevares og opdateres automatisk til konfigurationsversion 2.
 
 ## Lovlig og hensynsfuld brug
 
-Integrationen viser links og korte metadata; den kopierer ikke artikler. Respektér
-Bold.dk's vilkår. Opdateringsintervallet er bevidst sat til 15 minutter for at
-begrænse belastningen.
-
+Projektet er ikke udviklet, godkendt eller supporteret af Bold.dk. Integrationen
+viser korte metadata og links, ikke kopier af artikler. Data hentes hvert 15. minut.
