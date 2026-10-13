@@ -11,6 +11,7 @@ class Club:
 
     name: str
     url: str
+    logo_url: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
