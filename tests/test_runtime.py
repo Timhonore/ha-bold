@@ -9,7 +9,9 @@ import pytest
 
 pytest.importorskip("homeassistant")
 
+import voluptuous_serialize  # noqa: E402
 from homeassistant.core import HomeAssistant  # noqa: E402
+from homeassistant.helpers import config_validation as cv  # noqa: E402
 
 from custom_components.bold_dk.config_flow import BoldConfigFlow  # noqa: E402
 from custom_components.bold_dk.coordinator import (  # noqa: E402
@@ -47,6 +49,9 @@ def test_league_flow_and_sensor_setup(tmp_path):
         ):
             form = await flow.async_step_user()
             assert form["step_id"] == "user"
+            assert voluptuous_serialize.convert(
+                form["data_schema"], custom_serializer=cv.custom_serializer
+            )
             assert set(form["data_schema"].schema) == {"league_name", "league_url"}
             form = await flow.async_step_user(
                 {
@@ -55,6 +60,9 @@ def test_league_flow_and_sensor_setup(tmp_path):
                 }
             )
             assert form["step_id"] == "clubs"
+            assert voluptuous_serialize.convert(
+                form["data_schema"], custom_serializer=cv.custom_serializer
+            )
             created = await flow.async_step_clubs({"clubs": [club.url]})
         assert created["data"]["clubs"] == [{"name": club.name, "url": club.url}]
         coordinator = BoldCoordinator(
@@ -128,5 +136,55 @@ def test_entry_setup_and_migration(tmp_path, legacy):
             await setup_sensors(hass, entry, lambda values: entities.extend(values))
             assert len(entities) == 1
             assert entities[0].native_value == "En nyhed"
+
+    asyncio.run(scenario())
+
+
+@pytest.mark.parametrize(
+    "url", ["http://bold.dk/league", "https://example.com", "https://[bad", ""]
+)
+def test_invalid_league_url_returns_serializable_form(tmp_path, url):
+    async def scenario():
+        flow = BoldConfigFlow()
+        flow.hass = HomeAssistant(str(tmp_path))
+        with patch("custom_components.bold_dk.config_flow.BoldApiClient") as client:
+            form = await flow.async_step_user({"league_name": "Superligaen", "league_url": url})
+        assert form["step_id"] == "user"
+        assert form["errors"] == {"league_url": "invalid_url"}
+        assert voluptuous_serialize.convert(
+            form["data_schema"], custom_serializer=cv.custom_serializer
+        )
+        client.assert_not_called()
+
+    asyncio.run(scenario())
+
+
+def test_league_url_normalized_after_submission(tmp_path):
+    async def scenario():
+        flow = BoldConfigFlow()
+        flow.hass = HomeAssistant(str(tmp_path))
+        flow.async_set_unique_id = AsyncMock()
+        flow._abort_if_unique_id_configured = Mock()
+        client = Mock()
+        client.async_get_clubs = AsyncMock(
+            return_value=[Club("Randers FC", "https://bold.dk/fodbold/klubber/randers-fc")]
+        )
+        with (
+            patch("custom_components.bold_dk.config_flow.async_get_clientsession"),
+            patch("custom_components.bold_dk.config_flow.BoldApiClient", return_value=client),
+        ):
+            form = await flow.async_step_user(
+                {
+                    "league_name": "Superligaen",
+                    "league_url": "  https://bold.dk/fodbold/stillinger/superligaen/  ",
+                }
+            )
+        assert form["step_id"] == "clubs"
+        flow.async_set_unique_id.assert_awaited_once_with(
+            "https://bold.dk/fodbold/stillinger/superligaen"
+        )
+        client.async_get_clubs.assert_awaited_once_with(
+            "https://bold.dk/fodbold/stillinger/superligaen"
+        )
 
     asyncio.run(scenario())

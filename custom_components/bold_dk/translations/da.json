@@ -18,7 +18,8 @@
       }
     },
     "error": {
-      "cannot_connect": "Klubberne kunne ikke findes på ligasiden. Kontrollér adressen, og prøv igen."
+      "cannot_connect": "Klubberne kunne ikke findes på ligasiden. Kontrollér adressen, og prøv igen.",
+      "invalid_url": "Indsæt en gyldig https-adresse fra bold.dk."
     },
     "abort": {
       "already_configured": "Ligaen er allerede konfigureret."

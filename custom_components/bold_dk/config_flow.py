@@ -18,7 +18,10 @@ from .models import Club
 def valid_bold_url(value: str) -> str:
     """Validate and normalize a secure Bold.dk URL."""
     value = value.strip().rstrip("/")
-    parsed = urlparse(value)
+    try:
+        parsed = urlparse(value)
+    except ValueError as err:
+        raise vol.Invalid("Not a Bold.dk URL") from err
     if parsed.scheme != "https" or parsed.hostname not in {"bold.dk", "www.bold.dk"}:
         raise vol.Invalid("Not a Bold.dk URL")
     return value
@@ -39,23 +42,27 @@ class BoldConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
         if user_input is not None:
             self._league_name = user_input[CONF_LEAGUE_NAME].strip()
-            self._league_url = user_input[CONF_LEAGUE_URL]
-            await self.async_set_unique_id(self._league_url)
-            self._abort_if_unique_id_configured()
             try:
-                client = BoldApiClient(async_get_clientsession(self.hass))
-                self._clubs = await client.async_get_clubs(self._league_url)
-            except BoldApiError:
-                errors["base"] = "cannot_connect"
+                self._league_url = valid_bold_url(user_input[CONF_LEAGUE_URL])
+            except vol.Invalid:
+                errors[CONF_LEAGUE_URL] = "invalid_url"
             else:
-                return await self.async_step_clubs()
+                await self.async_set_unique_id(self._league_url)
+                self._abort_if_unique_id_configured()
+                try:
+                    client = BoldApiClient(async_get_clientsession(self.hass))
+                    self._clubs = await client.async_get_clubs(self._league_url)
+                except BoldApiError:
+                    errors["base"] = "cannot_connect"
+                else:
+                    return await self.async_step_clubs()
 
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema(
                 {
                     vol.Required(CONF_LEAGUE_NAME): str,
-                    vol.Required(CONF_LEAGUE_URL): valid_bold_url,
+                    vol.Required(CONF_LEAGUE_URL): str,
                 }
             ),
             errors=errors,
