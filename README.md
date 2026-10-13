@@ -33,7 +33,10 @@ valgt klub. Data opdateres hvert 15. minut for at begrænse belastningen på Bol
 Bold.dk kan ændre HTML-strukturen uden varsel. Hvis en værdi ikke findes på den
 offentlige klubside, vises sensoren som ukendt frem for at gætte på værdien.
 
-## Opdatering til 0.2.1
+## Opdatering til 0.2.2
+
+Version 0.2.2 retter også formularens schema-serialisering. URL-adressen valideres
+ved indsendelse, så opsætningsformularen kan indlæses uden HTTP 500.
 
 Geninstallér integrationen via HACS og genstart Home Assistant. Ved manuel
 installation erstattes hele `custom_components/bold_dk` med den nye mappe.
