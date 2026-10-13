@@ -13,6 +13,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
+from .branding import BOLD_ICON_URL
 from .const import CONF_TARGETS, DOMAIN
 from .coordinator import BoldCoordinator, BoldStoryCoordinator
 from .models import Club, ClubData, Target
@@ -36,7 +37,7 @@ CLUB_SENSORS = (
     BoldClubSensorDescription(
         key="last_match",
         translation_key="last_match",
-        icon="mdi:history",
+        icon="mdi:scoreboard",
         value_fn=lambda data: data.last_match.description if data.last_match else None,
     ),
     BoldClubSensorDescription(
@@ -48,7 +49,7 @@ CLUB_SENSORS = (
     BoldClubSensorDescription(
         key="top_scorer",
         translation_key="top_scorer",
-        icon="mdi:soccer",
+        icon="mdi:podium-gold",
         value_fn=lambda data: data.top_scorer,
         attributes_fn=lambda data: {"goals": data.top_scorer_goals},
     ),
@@ -79,6 +80,7 @@ class BoldLeagueSensor(CoordinatorEntity[BoldCoordinator], SensorEntity):
     """Represent the selected league and its current table."""
 
     _attr_icon = "mdi:trophy"
+    _attr_entity_picture = BOLD_ICON_URL
     _attr_entity_category = EntityCategory.DIAGNOSTIC
 
     def __init__(self, coordinator: BoldCoordinator, entry: ConfigEntry) -> None:
@@ -124,6 +126,14 @@ class BoldClubSensor(CoordinatorEntity[BoldCoordinator], SensorEntity):
         self._attr_device_info = _device_info(club.url, club.name, club.url)
 
     @property
+    def entity_picture(self) -> str | None:
+        """Use the current club crest, including for existing configurations."""
+        data = self.coordinator.data
+        if data and self.club.url in data.clubs:
+            return data.clubs[self.club.url].club.logo_url or self.club.logo_url
+        return self.club.logo_url
+
+    @property
     def native_value(self) -> Any:
         """Return the statistic value."""
         return self.entity_description.value_fn(self.coordinator.data.clubs[self.club.url])
@@ -132,7 +142,11 @@ class BoldClubSensor(CoordinatorEntity[BoldCoordinator], SensorEntity):
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return source and statistic-specific details."""
         data = self.coordinator.data.clubs[self.club.url]
-        return {"source_url": self.club.url, **self.entity_description.attributes_fn(data)}
+        return {
+            "source_url": self.club.url,
+            "club_logo": self.entity_picture,
+            **self.entity_description.attributes_fn(data),
+        }
 
 
 def _device_info(identifier: str, name: str, configuration_url: str) -> dict[str, Any]:

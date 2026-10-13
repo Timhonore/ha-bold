@@ -38,7 +38,10 @@ def test_league_flow_and_sensor_setup(tmp_path):
             return_value=([(4, club.name)], {"randers-fc": ("Test Spiller", 3)})
         )
         client.async_get_club_data = AsyncMock(
-            return_value=ClubData(club, next_match=Match("Randers FC", "AGF", "2026-10-16 19:00"))
+            return_value=ClubData(
+                Club(club.name, club.url, "https://bold.dk/img/tag/128x128/4301.png"),
+                next_match=Match("Randers FC", "AGF", "2026-10-16 19:00"),
+            )
         )
         flow = BoldConfigFlow()
         flow.hass = hass
@@ -64,7 +67,7 @@ def test_league_flow_and_sensor_setup(tmp_path):
                 form["data_schema"], custom_serializer=cv.custom_serializer
             )
             created = await flow.async_step_clubs({"clubs": [club.url]})
-        assert created["data"]["clubs"] == [{"name": club.name, "url": club.url}]
+        assert created["data"]["clubs"] == [{"name": club.name, "url": club.url, "logo_url": None}]
         coordinator = BoldCoordinator(
             hass, client, "Superligaen", created["data"]["league_url"], [club]
         )
@@ -78,6 +81,10 @@ def test_league_flow_and_sensor_setup(tmp_path):
         assert len(entities) == 5
         assert entities[0].native_value == 1
         assert entities[1].native_value == 4
+        for entity in entities[1:]:
+            assert entity.entity_picture == "https://bold.dk/img/tag/128x128/4301.png"
+            assert entity.extra_state_attributes["club_logo"] == entity.entity_picture
+        assert entities[0].entity_picture.endswith("apple-touch-icon.png")
         assert "2026-10-16 19:00" in entities[3].native_value
         assert entities[4].native_value == "Test Spiller"
         assert entities[4].extra_state_attributes["goals"] == 3

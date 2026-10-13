@@ -33,7 +33,17 @@ valgt klub. Data opdateres hvert 15. minut for at begrænse belastningen på Bol
 Bold.dk kan ændre HTML-strukturen uden varsel. Hvis en værdi ikke findes på den
 offentlige klubside, vises sensoren som ukendt frem for at gætte på værdien.
 
-## Opdatering til 0.2.2
+## Ikoner og logoer
+
+Integrationen medfølger med Bold.dk-brandbilleder til Home Assistant 2026.3 og
+nyere. Klubsensorerne viser klubbens logo som `entity_picture` og `club_logo`,
+og ligaentiteten viser Bold.dk-ikonet. Billederne hentes fra Bold.dk.
+Der er særskilte MDI-ikoner til placering, seneste kamp, næste kamp og topscorer.
+Hvis dashboardkortet understøtter det, skal `show_entity_picture: true` vælges
+for at vise logoet i stedet for MDI-ikonet. Eksisterende klubopsætninger får
+også logoer ved næste opdatering.
+
+## Opdatering til 0.2.3
 
 Version 0.2.2 retter også formularens schema-serialisering. URL-adressen valideres
 ved indsendelse, så opsætningsformularen kan indlæses uden HTTP 500.

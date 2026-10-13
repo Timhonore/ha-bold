@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import json
 import re
+from dataclasses import replace
 from html.parser import HTMLParser
 from typing import Any
 from urllib.parse import urljoin, urlparse
 
+from .branding import club_logo_url
 from .models import Club, ClubData, Match, Story
 from .structured import club_team, standings_rows, tournament_data
 
@@ -108,7 +110,7 @@ def parse_clubs(html: str, base_url: str) -> list[Club]:
             slug = team.get("pretty_url") or team.get("slug")
             if slug and team.get("name"):
                 url = urljoin(base_url, f"/fodbold/klubber/{slug}")
-                found[url] = Club(_clean(team["name"]), url)
+                found[url] = Club(_clean(team["name"]), url, club_logo_url(team))
         return list(found.values())
     found: dict[str, Club] = {}
     for name, url in _page(html, base_url).links:
@@ -148,7 +150,7 @@ def parse_club_data(html: str, base_url: str, club: Club) -> ClubData:
         )
         fixtures = sorted(matches.get("fixtures", []), key=lambda item: item.get("date", ""))
         return ClubData(
-            club=club,
+            club=replace(club, logo_url=club_logo_url(team) or club.logo_url),
             last_match=_structured_match(results[0], played=True) if results else None,
             next_match=_structured_match(fixtures[0], played=False) if fixtures else None,
         )
