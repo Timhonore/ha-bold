@@ -9,19 +9,13 @@ from typing import Any
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
-"""Sensors for the Bold.dk integration."""
-
-from __future__ import annotations
-
-from homeassistant.components.sensor import SensorEntity
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN
-from .coordinator import BoldCoordinator
-from .models import Club, ClubData
+from .const import CONF_TARGETS, DOMAIN
+from .coordinator import BoldCoordinator, BoldStoryCoordinator
+from .models import Club, ClubData, Target
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -59,7 +53,6 @@ CLUB_SENSORS = (
         attributes_fn=lambda data: {"goals": data.top_scorer_goals},
     ),
 )
-from .models import Target
 
 
 async def async_setup_entry(
@@ -68,6 +61,10 @@ async def async_setup_entry(
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Create a league sensor and four sensors per selected club."""
+    if CONF_TARGETS in entry.data:
+        coordinator = entry.runtime_data
+        async_add_entities(BoldSensor(coordinator, entry, target) for target in coordinator.targets)
+        return
     coordinator: BoldCoordinator = entry.runtime_data
     entities: list[SensorEntity] = [BoldLeagueSensor(coordinator, entry)]
     entities.extend(
@@ -145,17 +142,16 @@ def _device_info(identifier: str, name: str, configuration_url: str) -> dict[str
         "manufacturer": "Bold.dk",
         "configuration_url": configuration_url,
     }
-    """Set up one sensor per followed target."""
-    coordinator: BoldCoordinator = entry.runtime_data
-    async_add_entities(BoldSensor(coordinator, entry, target) for target in coordinator.targets)
 
 
-class BoldSensor(CoordinatorEntity[BoldCoordinator], SensorEntity):
+class BoldSensor(CoordinatorEntity[BoldStoryCoordinator], SensorEntity):
     """Show the latest Bold.dk story for a club or league."""
 
     _attr_icon = "mdi:soccer"
 
-    def __init__(self, coordinator: BoldCoordinator, entry: ConfigEntry, target: Target) -> None:
+    def __init__(
+        self, coordinator: BoldStoryCoordinator, entry: ConfigEntry, target: Target
+    ) -> None:
         super().__init__(coordinator)
         self.target = target
         self._attr_name = target.name

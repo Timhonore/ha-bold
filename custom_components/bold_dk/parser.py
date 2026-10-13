@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import json
 import re
 from html.parser import HTMLParser
+from typing import Any
 from urllib.parse import urljoin, urlparse
 
-from .models import Club, ClubData, Match
+from .models import Club, ClubData, Match, Story
+from .structured import club_team, standings_rows, tournament_data
 
 _CLUB_PATH = re.compile(r"^/fodbold/klubber/[^/]+/?$")
 _POSITION = re.compile(r"^\s*(\d{1,2})\.?\s*$")
@@ -97,6 +100,16 @@ def _page(html: str, base_url: str) -> _PageParser:
 
 def parse_clubs(html: str, base_url: str) -> list[Club]:
     """Return unique clubs linked from a Bold.dk league page."""
+    rows = standings_rows(html)
+    if rows:
+        found = {}
+        for row in rows:
+            team = row.get("team", {})
+            slug = team.get("pretty_url") or team.get("slug")
+            if slug and team.get("name"):
+                url = urljoin(base_url, f"/fodbold/klubber/{slug}")
+                found[url] = Club(_clean(team["name"]), url)
+        return list(found.values())
     found: dict[str, Club] = {}
     for name, url in _page(html, base_url).links:
         parsed = urlparse(url)
@@ -107,6 +120,13 @@ def parse_clubs(html: str, base_url: str) -> list[Club]:
 
 def parse_standings(html: str, base_url: str) -> list[tuple[int, str]]:
     """Parse position and club name from standings table rows."""
+    rows = standings_rows(html)
+    if rows:
+        return sorted(
+            (row["rank"], _clean(row["team"]["name"]))
+            for row in rows
+            if isinstance(row.get("rank"), int) and row.get("team", {}).get("name")
+        )
     page = _page(html, base_url)
     club_names = {name for name, url in page.links if _CLUB_PATH.match(urlparse(url).path)}
     standings: list[tuple[int, str]] = []
@@ -120,6 +140,18 @@ def parse_standings(html: str, base_url: str) -> list[tuple[int, str]]:
 
 def parse_club_data(html: str, base_url: str, club: Club) -> ClubData:
     """Parse latest match, next match and top scorer from a club page."""
+    team = club_team(html)
+    if team:
+        matches = team.get("matches", {})
+        results = sorted(
+            matches.get("results", []), key=lambda item: item.get("date", ""), reverse=True
+        )
+        fixtures = sorted(matches.get("fixtures", []), key=lambda item: item.get("date", ""))
+        return ClubData(
+            club=club,
+            last_match=_structured_match(results[0], played=True) if results else None,
+            next_match=_structured_match(fixtures[0], played=False) if fixtures else None,
+        )
     page = _page(html, base_url)
     last_match = _match_from_sections(page.sections, ("seneste kamp", "sidste kamp", "resultat"))
     next_match = _match_from_sections(page.sections, ("næste kamp", "kommende kamp", "kampprogram"))
@@ -131,6 +163,31 @@ def parse_club_data(html: str, base_url: str, club: Club) -> ClubData:
         top_scorer=scorer,
         top_scorer_goals=goals,
     )
+
+
+def _structured_match(value: dict[str, Any], *, played: bool) -> Match | None:
+    home = value.get("home_team", {})
+    away = value.get("away_team", {})
+    if not home.get("name") or not away.get("name"):
+        return None
+    score = None
+    if played and home.get("score") is not None and away.get("score") is not None:
+        score = f"{home['score']}-{away['score']}"
+    return Match(_clean(home["name"]), _clean(away["name"]), value.get("date"), score)
+
+
+def parse_top_scorers(html: str) -> dict[str, tuple[str, int]]:
+    """Return the leading scorer per club in this league."""
+    found = {}
+    for row in tournament_data(html).get("topscorers", []):
+        team = row.get("team", {})
+        person = row.get("person", {})
+        goals = row.get("goals")
+        slug = team.get("pretty_url") or team.get("slug")
+        if slug and person.get("name") and isinstance(goals, int):
+            if slug not in found or goals > found[slug][1]:
+                found[slug] = (_clean(person["name"]), goals)
+    return found
 
 
 def _match_from_sections(sections: list[tuple[str, str]], labels: tuple[str, ...]) -> Match | None:
@@ -157,16 +214,6 @@ def _top_scorer(sections: list[tuple[str, str]]) -> tuple[str | None, int | None
         name = _clean(text[: goals.start()] if goals else text).rstrip(" -–:")
         return (name or None, number)
     return None, None
-"""Parse stories from Bold.dk pages without third-party dependencies."""
-
-from __future__ import annotations
-
-import json
-from html.parser import HTMLParser
-from typing import Any
-from urllib.parse import urljoin, urlparse
-
-from .models import Story
 
 
 class _BoldParser(HTMLParser):
